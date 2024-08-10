@@ -25,15 +25,15 @@ pub const virtualMachine = struct {
     gpr: [4]i32 = undefined, //general purpose registers
     flag_register: i32 = 0, //32bit flag register
     stack: [STACK_SIZE / 4]i32 = undefined,
-    ram: [RAM_SIZE]instruction.Instruction = undefined,
+    text: [RAM_SIZE]instruction.Instruction = undefined,
 
     pub fn init() virtualMachine {
         return virtualMachine{};
     }
     pub fn program_contains(self: *virtualMachine, inst: instruction.Instruction) bool { //language so mature that cant do this shit
         var contains = false;
-        for (0..self.ram.len) |i| {
-            if (@intFromEnum(self.ram[i]) == @intFromEnum(inst)) {
+        for (0..self.text.len) |i| {
+            if (@intFromEnum(self.text[i]) == @intFromEnum(inst)) {
                 contains = true;
             }
         }
@@ -41,7 +41,7 @@ pub const virtualMachine = struct {
     }
     pub fn load_program_from_memory(self: *virtualMachine, program: []instruction.Instruction) !void {
         assert(program.len < RAM_SIZE);
-        @memcpy(self.ram[0..program.len], program);
+        @memcpy(self.text[0..program.len], program);
         const is_halt = self.program_contains(.halt);
         if (!is_halt) {
             std.debug.print("error: program should contain halt instruction\n", .{});
@@ -63,7 +63,7 @@ pub const virtualMachine = struct {
         if (self.hlt == true) {
             return vmError.halted;
         }
-        const inst: instruction.Instruction = self.ram[@intCast(self.ip)];
+        const inst: instruction.Instruction = self.text[@intCast(self.ip)];
         switch (inst) {
             .pushi => |value| {
                 assert(self.sp <= self.stack.len);
