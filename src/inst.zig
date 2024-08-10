@@ -10,8 +10,8 @@ pub const Instruction = union(enum) {
     incr: u2,
     decr: u2,
     cmp: u4, //takes 2 registers to compare
-    jmpzi: i12,
-    jmpnzi: i12,
+    jmpzi: u12,
+    jmpnzi: u12,
     jmpzr: u4,
     pushf,
     popf,

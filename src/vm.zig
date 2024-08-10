@@ -8,7 +8,6 @@ const vmError = error{
     programMissingHalt,
     halted,
     Exhausted,
-    OutOfBoundsJump,
 };
 const ax = 0;
 const bx = 1;
@@ -137,32 +136,23 @@ pub const virtualMachine = struct {
                 self.flag_register |= @intFromBool(reg1_val == reg2_val);
                 self.ip += 1;
             },
-            .jmpnzi => |offset| {
+            .jmpnzi => |address| {
                 if (self.flag_register & 1 == 1) {
                     self.ip += 1;
                     return;
                 }
-                if (@as(i12, @intCast(self.ip)) + offset < self.ram.len or @as(i12, @intCast(self.ip)) + offset > 0) {
-                    const result: i12 = @as(i12, @intCast(self.ip)) + offset;
-                    self.ip = @as(u12, @intCast(result));
-                } else {
-                    return vmError.OutOfBoundsJump;
-                }
+                self.ip = address;
             },
-            .jmpzi => |offset| {
+            .jmpzi => |address| {
                 if (self.flag_register & 1 != 1) {
                     self.ip += 1;
                     return;
                 }
-                if (@as(i12, @intCast(self.ip)) + offset < self.ram.len or @as(i12, @intCast(self.ip)) + offset > 0) {
-                    const result: i12 = @as(i12, @intCast(self.ip)) + offset;
-                    self.ip = @as(u12, @intCast(result));
-                } else {
-                    return vmError.OutOfBoundsJump;
-                }
+                self.ip = address;
             },
 
             .jmpzr => |offset| {
+                assert(true); //not implemented
                 _ = offset;
             },
             .pushf => {

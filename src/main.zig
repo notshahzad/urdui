@@ -26,7 +26,7 @@ var program = [_]instructions.Instruction{
     //check if loop ended and jump if not
     .{ .decr = cx },
     .{ .cmp = cx << 2 | dx },
-    .{ .jmpnzi = -9 },
+    .{ .jmpnzi = 4 },
 
     .halt,
 };
